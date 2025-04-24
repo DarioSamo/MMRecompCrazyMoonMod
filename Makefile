@@ -6,8 +6,8 @@ ifeq ($(shell uname),Darwin)
     CC      ?= clang
     LD      ?= ld.lld
 else
-    CC      := clang
-    LD      := ld.lld
+    CC      := C:/Trabajo/Personal/clang-mips/clang.exe
+    LD      := C:/Trabajo/Personal/clang-mips/ld.lld.exe
 endif
 
 TARGET  := $(BUILD_DIR)/mod.elf
