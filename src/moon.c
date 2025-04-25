@@ -68,12 +68,14 @@ void EnFall_CrashingMoon_PerformActionsCommonHook(EnFall* this, PlayState* play)
 
     float vectorCos = MAX(Math3D_Cos(&eyeToWorld, &eyeToAt), 0.0f);
     float moonScale = Math_PowF(vectorCos, 4.0f);
+    float sfxScale = Math_PowF(vectorCos, 6.0f);
 
     // Restore the stored scale first before scaling the moon.
     this->actor.scale = g_moonScale;
     Math_Vec3f_Scale(&this->actor.scale, 1.0f + (cosf(g_moonTime) * 0.5f) * moonScale);
 
-    if (vectorCos > 0.0f) {
+    float volume = MIN(2.0f * vectorCos * intensity, 1.0f);
+    if (volume > 0.25f) {
         if (g_moonSfxTimer == 0) {
             u32 sfxRandom = Rand_Next() % 100;
             u32 sfxId = NA_SE_VO_LI_DAMAGE_S;
@@ -85,10 +87,10 @@ void EnFall_CrashingMoon_PerformActionsCommonHook(EnFall* this, PlayState* play)
             }
 
             Player* player = GET_PLAYER(play);
-            g_moonSfxVolumes[g_moonSfxIndex] = MIN(2.0f * vectorCos * intensity, 1.0f);
+            g_moonSfxVolumes[g_moonSfxIndex] = volume;
             g_moonSfxFrequencies[g_moonSfxIndex] = 0.6f + Rand_ZeroOne() * 0.2f;
             AudioSfx_PlaySfx(sfxId, &player->actor.projectedPos, 4, &g_moonSfxFrequencies[g_moonSfxIndex], &g_moonSfxVolumes[g_moonSfxIndex], &gSfxDefaultReverb);
-            g_moonSfxTimer = (u32)(Math_FRoundF(1.0f + (Rand_ZeroOne() / intensity)));
+            g_moonSfxTimer = (u32)(Math_FRoundF(1.0f + ((0.5f + Rand_ZeroOne() * 0.5f) / MAX(sfxScale * intensity, 0.05f))));
             g_moonSfxIndex = (g_moonSfxIndex + 1) % G_MOON_SFX_MAX;
         }
         else {
